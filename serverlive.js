@@ -12,9 +12,14 @@ app.use(express.json());
 
 console.log("Middleware initialized.");
 
-// MongoDB Atlas connection string
-const MONGODB_URI =
-  "mongodb+srv://sakhaghotekar:G5lK7HnYZ4h0YzpE@knowyourcoaching.fp1oe.mongodb.net/Demo";
+// MongoDB Atlas connection string from environment variable
+const MONGODB_URI = process.env.MONGO_URI;  // Use environment variable for MongoDB URI
+
+// Check if MONGODB_URI is set
+if (!MONGODB_URI) {
+  console.error("MongoDB URI is not defined in environment variables.");
+  process.exit(1);
+}
 
 // Connect to MongoDB Atlas
 console.log("Attempting to connect to MongoDB Atlas...");
@@ -37,8 +42,8 @@ app.use("/pakages", pakagesRoutes);
 app.use("/all-data", getAllDataRoutes);
 console.log("Routes initialized: /pakages and /all-data");
 
-// Start the server
-const port = 3000;
+// Use PORT from environment variable, or default to 3000 if not set
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
