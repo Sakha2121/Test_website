@@ -7,7 +7,9 @@ const PakageModel = mongoose.model("Pakage", pakageSchema, "pakages");
 
 router.get("/", async (req, res) => {
   try {
+    // Extract query parameters
     const { L1, L2, L3, Coaching_type, Coaching_ID } = req.query;
+    console.log("Received Query Parameters:", req.query);
 
     // Check for mandatory fields
     const mandatoryFields = {
@@ -22,6 +24,7 @@ router.get("/", async (req, res) => {
       .map(([field]) => field);
 
     if (missingFields.length > 0) {
+      console.log("Missing Mandatory Fields:", missingFields);
       return res.status(400).json({
         error: "Missing required fields",
         missingFields: missingFields,
@@ -39,12 +42,18 @@ router.get("/", async (req, res) => {
     };
 
     // Add optional filters
-    if (L2 && L2.trim() !== "") matchFilter.L2_Classification = L2;
-    if (Coaching_ID && Coaching_ID.trim() !== "")
+    if (L2 && L2.trim() !== "") {
+      matchFilter.L2_Classification = L2;
+      console.log("Added optional filter: L2_Classification =", L2);
+    }
+    if (Coaching_ID && Coaching_ID.trim() !== "") {
       matchFilter.Coaching_ID = Coaching_ID;
+      console.log("Added optional filter: Coaching_ID =", Coaching_ID);
+    }
 
     console.log("Applying Filters:", matchFilter);
 
+    // Perform MongoDB aggregation
     const pakages = await PakageModel.aggregate([
       {
         $match: matchFilter,
@@ -94,6 +103,11 @@ router.get("/", async (req, res) => {
     ]);
 
     console.log("Filtered Response Count:", pakages.length);
+    if (pakages.length === 0) {
+      console.log("No packages found with the given filters.");
+    } else {
+      console.log("Packages retrieved:", pakages.slice(0, 5)); // Log first 5 packages for review
+    }
 
     res.json(pakages);
   } catch (error) {
