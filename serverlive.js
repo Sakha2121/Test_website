@@ -12,8 +12,9 @@ app.use(express.json());
 
 console.log("Middleware initialized.");
 
-// MongoDB Atlas connection string from environment variable
-const MONGODB_URI = process.env.MONGO_URI;  // Use environment variable for MongoDB URI
+// MongoDB Atlas connection string 
+const MONGODB_URI = "mongodb+srv://sakhaghotekar:G5lK7HnYZ4h0YzpE@knowyourcoaching.fp1oe.mongodb.net/Demo";
+
 
 // Check if MONGODB_URI is set
 if (!MONGODB_URI) {
