@@ -7,9 +7,7 @@ const PakageModel = mongoose.model("Pakage", pakageSchema, "pakages");
 
 router.get("/", async (req, res) => {
   try {
-    // Extract query parameters
     const { L1, L2, L3, Coaching_type, Coaching_ID } = req.query;
-    console.log("Received Query Parameters:", req.query);
 
     // Check for mandatory fields
     const mandatoryFields = {
@@ -24,7 +22,6 @@ router.get("/", async (req, res) => {
       .map(([field]) => field);
 
     if (missingFields.length > 0) {
-      console.log("Missing Mandatory Fields:", missingFields);
       return res.status(400).json({
         error: "Missing required fields",
         missingFields: missingFields,
@@ -42,18 +39,12 @@ router.get("/", async (req, res) => {
     };
 
     // Add optional filters
-    if (L2 && L2.trim() !== "") {
-      matchFilter.L2_Classification = L2;
-      console.log("Added optional filter: L2_Classification =", L2);
-    }
-    if (Coaching_ID && Coaching_ID.trim() !== "") {
+    if (L2 && L2.trim() !== "") matchFilter.L2_Classification = L2;
+    if (Coaching_ID && Coaching_ID.trim() !== "")
       matchFilter.Coaching_ID = Coaching_ID;
-      console.log("Added optional filter: Coaching_ID =", Coaching_ID);
-    }
 
     console.log("Applying Filters:", matchFilter);
 
-    // Perform MongoDB aggregation
     const pakages = await PakageModel.aggregate([
       {
         $match: matchFilter,
@@ -83,19 +74,40 @@ router.get("/", async (req, res) => {
           Pakage_ID: 1,
           Coaching_type: 1,
           Subjects: 1,
-          Subjects2: 1,
-          Filter2: 1,
-          Fees: 1,
-          Lecture_mode: 1,
-          "#Mentorship_sessions": 1,
+
+          Fees_range1: 1,
+          Fees_range2: 1,
+
+          Recording: 1,
           Weekend_batch: 1,
-          "#Full_length_mocks": 1,
-          "#Sectional_tests": 1,
-          CAT_National_benchmarking: 1,
+          Platform_accessibility: 1,
+          Mobile_app_android: 1,
+          Mobile_app_ios: 1,
           CAT_OMETS_access: 1,
-          CAT_Profile_SOP_evaluation: 1,
+          Study_material: 1,
+
+          "#Full_length_mocks": 1,
+          "#Actual_mocks": 1,
+          "#Sectional_tests": 1,
+          Mock_solution: 1,
+          CAT_National_benchmarking: 1,
+
+          Mentorship_sessions: 1,
+          Doubt_solving: 1,
+
+          Community_forum: 1,
+
+          ProfileSOP_evaluation: 1,
           "#CAT_Mock_interview_online": 1,
           "#CAT_Mock_interview_offline": 1,
+          GD_simulations: 1,
+          WAT_workshop: 1,
+          Personalised_feedback_report: 1,
+          Resource_library: 1,
+          Live_QnA: 1,
+
+          Link: 1,
+
           Coaching_Name: "$instituteDetails.Coaching_Name",
           coachinglogo: "$instituteDetails.coachinglogo",
         },
@@ -103,11 +115,6 @@ router.get("/", async (req, res) => {
     ]);
 
     console.log("Filtered Response Count:", pakages.length);
-    if (pakages.length === 0) {
-      console.log("No packages found with the given filters.");
-    } else {
-      console.log("Packages retrieved:", pakages.slice(0, 5)); // Log first 5 packages for review
-    }
 
     res.json(pakages);
   } catch (error) {
