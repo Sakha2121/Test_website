@@ -49,10 +49,11 @@ app.use("/updateProfile", updateProfileRoutes); // New route for updating user p
 app.use(express.static("public"));
 
 // Start the server
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`Server is running on https://test-website-gflo.onrender.com:${port}`);
+  console.log(`Server is running on port ${port}`);
 });
+
 
 // Handle uncaught exceptions and rejections
 process.on("uncaughtException", (err) => {
