@@ -39,9 +39,11 @@ mongoose
 // Public routes (no authentication required)
 app.use("/auth", authRoutes);
 app.use("/OTP", require("./routes/OTP")); //OTP route
+app.use("/pakages", pakagesRoutes);
+
 
 // Protected routes (require authentication)
-app.use("/pakages", auth, pakagesRoutes);
+
 app.use("/all-data", auth, getAllDataRoutes);
 app.use("/updateProfile", updateProfileRoutes); // New route for updating user profile
 
