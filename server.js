@@ -19,7 +19,7 @@ console.log("Middleware initialized.");
 
 // MongoDB Atlas connection string
 const MONGODB_URI =
-  "mongodb+srv://sakhaghotekar:G5lK7HnYZ4h0YzpE@knowyourcoaching.fp1oe.mongodb.net/Demo";
+  "mongodb+srv://sakhaghotekar:G5lK7HnYZ4h0YzpE@knowyourcoaching.fp1oe.mongodb.net/Production";
 
 // Connect to MongoDB Atlas
 console.log("Attempting to connect to MongoDB Atlas...");
