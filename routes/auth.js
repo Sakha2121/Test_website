@@ -171,4 +171,60 @@ router.put("/profile", async (req, res) => {
   }
 });
 
+const OTP = require("../models/otps");
+const bcrypt = require("bcrypt");
+
+// Send OTP for Password Reset
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOTP = await bcrypt.hash(otp, 10);
+
+  await OTP.deleteMany({ email }); // Remove existing OTPs
+  await OTP.create({ email, otp: hashedOTP });
+
+  // Send OTP via email
+  try {
+    await transporter.sendMail({
+      from: "Verification@knowyourcoaching.in",
+      to: email,
+      subject: "Password Reset OTP",
+      text: `Your OTP for password reset is: ${otp}`,
+      html: `<p>Your OTP is: <strong>${otp}</strong></p>`,
+    });
+    res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to send OTP", error: error.message });
+  }
+});
+
+// Verify OTP and Reset Password
+router.post("/reset-password", async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  const storedOTPRecord = await OTP.findOne({ email });
+  if (!storedOTPRecord) {
+    return res.status(400).json({ message: "OTP expired or invalid" });
+  }
+
+  const isValid = await bcrypt.compare(otp, storedOTPRecord.otp);
+  if (!isValid) return res.status(400).json({ message: "Invalid OTP" });
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await User.findOneAndUpdate({ email }, { password: hashedPassword });
+  await OTP.deleteOne({ email });
+
+  res.status(200).json({ message: "Password reset successfully" });
+});
+
 module.exports = router;
